@@ -1,0 +1,21 @@
+﻿Variable name,Format,Description
+Country name,string,The name of the country
+Regional indicator,string,The region of the country
+Ladder score,numerical,The ladder score of the country
+Standard error of ladder score,numerical,The standard error of the ladder score
+upperwhisker,numerical,The upper whisker of the ladder score
+lowerwhisker,numerical,The lower whisker of the ladder score
+Logged GDP per capita,numerical,The logged GDP per capita of the country
+Social support,numerical,The social support score of the country
+Healthy life expectancy,numerical,The healthy life expectancy of the country
+Freedom to make life choices,numerical,The freedom to make life choices score of the country
+Generosity,numerical,The generosity score of the country
+Perceptions of corruption,numerical,The perceptions of corruption score of the. Country
+Ladder score in Dystopia,numerical,The ladder score in dystopia
+Explained by: Logged GDP per capita,numerical,Amount of happiness score explained by logged GDP per capita
+Explained by: Social support,numerical,Amount of happiness score explained by social support
+Explained by: Healthy life expectancy,numerical,Amount of happiness score explained by healthy life expectancy
+Explained by: Freedom to make life choices,numerical,Amount of happiness score explained by freedom to make life choices
+Explained by: Generosity,numerical,Amount of happiness score explained by generosity
+Explained by: Perceptions of corruption,numerical,Amount of happiness score explained by perceptions of corruotion
+Dystopia + residual,numerical,Dystopia score plus residual
