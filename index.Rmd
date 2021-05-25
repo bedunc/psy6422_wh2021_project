@@ -1,0 +1,141 @@
+---
+title: "2021 World Happiness Data"
+knit: (function(input_file, encoding) {
+  out_dir <- 'docs';
+  rmarkdown::render(input_file,
+ encoding=encoding,
+ output_file=file.path(dirname(input_file), out_dir, 'index.html'))})
+author: "Bethany Duncan"
+date: "24/05/2021"
+output: 
+  html_document:
+  fig_crop: no
+
+---
+```{r setup, include=FALSE}
+# This project uses 'Packrat' as a dependency management system
+packrat::init
+## load packages
+require(tidyverse) #package for data wrangling
+require(ggplot2) #package for plotting graphs
+require(here) #package for relative working directory
+require(plotly) #package for making graphs interactive
+require(knitr) #package for knitting .rmd file to html document
+```
+
+\
+
+```{r, fig.align='left', out.width="20%", echo=FALSE}
+knitr::include_graphics(here("images", "earth.png"))
+```
+
+\
+
+### Data Origins
+For the past nine years the Sustainable Development Solutions Network (a global initiative for the United Nations) has released the World Happiness Report. These reports are written by a group of independent experts and use data from the Gallup World Poll and Lloyd's Register Foundation. The World Happiness Report 2021 uses data from the Gallup World Poll surveys from 2018 to 2020. Gallup's World Poll (of more than 150 countries) uses the Cantril Self-Anchoring Striving Scale. The Cantril Scale/Ladder measurement asks respondents to think of a ladder, with the best possible life being a 10, and the worst at 0. They are then asked to rate their own life on the 0 to 10 scale (more information on how this scale is used by Gallup can be found [here](https://news.gallup.com/poll/122453/understanding-gallup-uses-cantril-scale.aspx)).  
+\
+The data used in this project was retrieved from the [World Happiness Report website](https://worldhappiness.report/ed/2021/#appendices-and-data). This project uses the 'Data for Figure 2.1' data set. 
+\
+
+### Research Questions
+* How do the regions of the world compare to each other on the Cantril Ladder?
+* What is the relationship between GDP per Capita and Happiness scores for each country?
+
+### Data
+```{r data, echo=FALSE}
+# load data file into environment
+my_data <- read.csv(here('data', 'whr2021.csv')) 
+```
+The first 6 rows and 4 columns of this data set are:
+``` {r, echo=FALSE}
+knitr::kable(head(my_data[,1:4]))
+```
+
+In this project, the scores from the Cantril Ladder scale will be referred to as 'Happiness Scores'.
+
+
+### Visualisation 1: Average Happiness Scores for the Regions of the World
+``` {r, data prep}
+#create dataframe with new values of average scores
+df1 <- my_data %>%
+  group_by(Regional.indicator) %>%
+  summarise(avg.happiness.score = round(mean(Ladder.score), 2),
+            avg.social.score = round(mean(Social.support), 2),
+            avg.healthy.life.expectancy = round(mean(Healthy.life.expectancy), 2),
+            avg.freedom = round(mean(Freedom.to.make.life.choices), 2),
+            avg.generosity = round(mean(Generosity), 2),
+            avg.perceptions.of.corruption = round(mean(Perceptions.of.corruption), 2)) 
+```
+
+``` {r, bar chart}
+plot1 <-  ggplot(df1, aes(x = reorder(Regional.indicator, +avg.happiness.score),
+                          y = avg.happiness.score,
+                          text = paste("Region: ", Regional.indicator,
+                                       "<br>Average Happiness Score", avg.happiness.score))) + 
+  geom_col(aes(fill = avg.happiness.score)) + #fill the graph according to average happiness score
+  ggtitle('Average Happiness Score per Region') + #add title to the graph
+  theme(axis.text.x = element_text(angle = 75, hjust = 1, vjust = 1), #change angle of labels on X axis
+        legend.title = element_text(size = 9)) + #adjust aesthetics of title of the legend
+  xlab('Regions') + #add label to X axis
+  ylab('Average Happiness Score') + #add label to Y axis
+  scale_fill_gradient(low = '#3f007d', high = '#dadaeb', #add colour gradient from low to high values
+                      name = 'Average Happiness Score') #add title to legend
+
+finalplot1 <- ggplotly(plot1, tooltip = 'text')
+```
+
+*Scroll over the bars to see Average Happiness Scores.*
+
+``` {r, fig.dim = c(8, 6), echo=FALSE}
+finalplot1
+```
+
+\
+
+### Visualisation 2: What is the relationship between GDP per Capita and Happiness Scores?
+``` {r, scatterplot}
+
+plot2 <- ggplot(my_data, aes(x = Logged.GDP.per.capita, #add x variable
+                             y = Ladder.score, #add y variable
+                             group = Regional.indicator, #group by Regional Indicator
+                             text = paste("Region: ", Regional.indicator, #add text for hover text
+                                          "<br>Country: ", Country.name,
+                                          "<br>Happiness Score: ", Ladder.score,
+                                          "<br>Logged GDP per Capita: ", Logged.GDP.per.capita))) +
+  geom_point(aes(colour = Regional.indicator)) + #plots have colour differentiation by regional indicator
+  ggtitle("Logged GDP per Capita and Happiness Score per Region") + #add title to the graph
+  theme(legend.title = 'Regional Indicator') + #add title to the legend
+  xlab('Logged GDP per Capita') + #add x axis label
+  ylab('Happiness Score') + #add y axis label
+  scale_colour_brewer(palette = "RdYlBu") + #add colour palette from ColourBrewer
+  theme_bw() #set theme to white background
+
+finalplot2 <- ggplotly(plot2, tooltip = 'text') #make graph interactive with hover text
+```
+
+
+*Scroll over the points on the graph to see Region, Country Name, Happiness Score, and GDP Per Capita score.*
+
+``` {r, fig.dim = c(8, 6), echo=FALSE}
+finalplot2
+```
+
+\
+
+### Summary and future directions
+There are distinct differences in Happiness Scores between regions of the world (visualisation 1), with North America and ANZ scoring highest and South Asia scoring the lowest. The relationship between GDP per Capita and Happiness Score is apparent (Visualisation 2). The general trend is the the higher the GDP per Capita, the higher the Happiness Score. There is one obvious outlier in Botswana, where they have a relatively high GDP per capita but an extremely low Happiness Score.  
+The World Happiness Reports contain a wealth of information relating to quality of life within countries and factors that underpin it. This project only scratches the surface of the dataset and the possibilities of exploring the data are abound. As this is the ninth World Happiness Report it would be useful to see how Happiness Scores and the scores of the other factors have changed over the years and whether there are any significant changes either way. 
+
+### Dependencies
+
+This file was created using:  
+*RStudio Version 1.4.1103*  
+*R version 4.0.3*  
+*macOS Big Sur, Version 11.2.3*   
+
+Packrat is used for package management.  
+
+The full repository for this project can be found [here](https://github.com/bedunc/psy6422_wh2021_project). 
+
+
+
